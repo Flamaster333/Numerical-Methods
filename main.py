@@ -37,6 +37,7 @@ def formulaMACD():
 
 
 def showPlot():
+
     plt.xlabel("Samples 29.03.2019 - 17.03.2023")
     plt.ylabel("Close of the day on stocks")
     plt.show()
@@ -45,16 +46,19 @@ def showPlot():
 # all plot creating
 def drawPlots(samples, macd, signal):
     # main data plot
-    plt.plot(samples, linewidth='0.8')
+    plt.figure().set_figwidth(15)
+    plt.plot(samples, color='g', linewidth='0.8')
     showPlot()
     # macd and signal plot
-    plt.plot(macd, linewidth='0.8')
-    plt.plot(signal, linewidth='0.8')
+    plt.figure().set_figwidth(15)
+    plt.plot(macd, color='b', linewidth='0.8')
+    plt.plot(signal, color='r', linewidth='0.8')
     showPlot()
     # all in one plot
-    plt.plot(samples, linewidth='0.8')
-    plt.plot(macd, linewidth='0.8')
-    plt.plot(signal, linewidth='0.8')
+    plt.figure().set_figwidth(20)
+    plt.plot(samples, color='g', linewidth='0.8')
+    plt.plot(macd, color='b', linewidth='0.8')
+    plt.plot(signal, color='r', linewidth='0.8')
     showPlot()
 
 
