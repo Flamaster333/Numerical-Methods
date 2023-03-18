@@ -33,28 +33,30 @@ def formulaMACD():
         macd.append((ema12 - ema26))
         ema9 = calcEMA(macd, 9, current)
         signal.append(ema9)
-    drawMainPlot(samples)
-    drawMacdSignalPlot(macd, signal)
-    drawAllInOnePlots(samples, macd, signal)
-    
+    drawPlots(samples, macd, signal)
 
-def drawMainPlot(samples):
-    samples.plot(linewidth='0.8')
+
+def showPlot():
     plt.xlabel("Samples 29.03.2019 - 17.03.2023")
-    plt.ylabel("close of the day on stocks")
+    plt.ylabel("Close of the day on stocks")
     plt.show()
 
 
-def drawMacdSignalPlot(macd, signal):
+# all plot creating
+def drawPlots(samples, macd, signal):
+    # main data plot
+    plt.plot(samples, linewidth='0.8')
+    showPlot()
+    # macd and signal plot
     plt.plot(macd, linewidth='0.8')
     plt.plot(signal, linewidth='0.8')
-    plt.xlabel("Samples 29.03.2019 - 17.03.2023")
-    plt.ylabel("close of the day on stocks")
-    plt.show()
+    showPlot()
+    # all in one plot
+    plt.plot(samples, linewidth='0.8')
+    plt.plot(macd, linewidth='0.8')
+    plt.plot(signal, linewidth='0.8')
+    showPlot()
 
-
-def drawAllInOnePlots(samples, macd, signal):
-    x = samples
 
 
 formulaMACD()
