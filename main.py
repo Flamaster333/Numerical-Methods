@@ -55,7 +55,7 @@ def drawPlots(samples, macd, signal):
     plt.plot(signal, color='r', linewidth='0.8')
     showPlot()
     # all in one plot
-    plt.figure().set_figwidth(20)
+    plt.figure().set_figwidth(15)
     plt.plot(samples, color='g', linewidth='0.8')
     plt.plot(macd, color='b', linewidth='0.8')
     plt.plot(signal, color='r', linewidth='0.8')
