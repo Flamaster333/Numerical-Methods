@@ -1,11 +1,11 @@
-import csv
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy
+
 
 def readCsvFile():
     samples = []
     data = pd.read_csv("dis.csv")
-    data.columns
     samples = data.Zamkniecie
     return samples
 
@@ -28,5 +28,7 @@ def formulaMACD(samples):
 
 
 samples = readCsvFile()
-samples.plot()
+samples.plot(linewidth='0.8')
+plt.xlabel("Samples 29.03.2019 - 17.03.2023")
+plt.ylabel("close of the day on stocks")
 plt.show()
