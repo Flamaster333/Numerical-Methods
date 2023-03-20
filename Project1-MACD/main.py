@@ -1,10 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy
 
 
 def readCsvFile():
-    samples = []
     data = pd.read_csv("dis.csv")
     samples = data.Zamkniecie
     return samples
@@ -37,7 +35,7 @@ def formulaMACD():
 
 
 def showPlot():
-
+    plt.title("Walt Disney Co")
     plt.xlabel("Samples 29.03.2019 - 17.03.2023")
     plt.ylabel("Close of the day on stocks")
     plt.show()
@@ -62,5 +60,5 @@ def drawPlots(samples, macd, signal):
     showPlot()
 
 
-
+# start
 formulaMACD()
