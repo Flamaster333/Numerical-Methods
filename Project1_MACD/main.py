@@ -2,10 +2,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def readCsvFile():
+def readCsvFileClosure():
     data = pd.read_csv("dis.csv")
     samples = data.Zamkniecie
     return samples
+
+
+def readCsvFileDates():
+    data = pd.read_csv("dis.csv")
+    dates = data.Data
+    return dates
 
 
 def calcEMA(samples, n, current):
@@ -22,10 +28,10 @@ def calcEMA(samples, n, current):
 
 
 def formulaMACD():
-    samples = readCsvFile()
+    samples = readCsvFileClosure()
     macd = []
     signal = []
-    for current in range(1000):
+    for current in range(50):
         ema12 = calcEMA(samples, 12, current)
         ema26 = calcEMA(samples, 26, current)
         macd.append((ema12 - ema26))
@@ -58,6 +64,25 @@ def drawPlots(samples, macd, signal):
     plt.plot(macd, color='b', linewidth='0.8')
     plt.plot(signal, color='r', linewidth='0.8')
     showPlot()
+
+
+def intersectionSignalMacd(macd, signal):
+    macd_was_higher = 1
+    intersection_values = []
+
+    for i in range(35, 1000):
+        if macd_was_higher == 1 and macd[i] <= signal[i]:
+            intersection_values.append((i, macd_was_higher))
+            macd_was_higher = 0
+        elif macd_was_higher == 0 and macd[i] >= signal[i]:
+            intersection_values.append((i, macd_was_higher))
+            macd_was_higher = 1
+    return intersection_values
+
+
+def simulation(samples, intersection_values):
+    budget = 1000
+    
 
 
 # start
