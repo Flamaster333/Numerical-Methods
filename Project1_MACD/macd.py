@@ -10,9 +10,11 @@ class Macd:
     intersection_values = []
     budget_plot = []
 
-    def __init__(self, file_name, number_of_samples):
+    def __init__(self, file_name, number_of_samples, start_day, end_day):
         self.number_of_samples = number_of_samples
         self.file_name = file_name
+        self.start_day = start_day
+        self.end_day = end_day
 
     def readCsvFileClosure(self):
         data = pd.read_csv(self.file_name)
@@ -54,12 +56,17 @@ class Macd:
 
     # all plot creating
     def drawPlots(self):
+        # self.signal = self.signal[(self.start_day - 1):(self.end_day - 1)]
+        # self.macd = self.macd[(self.start_day - 1):(self.end_day - 1)]
+        # self.samples = self.samples[(self.start_day - 1):(self.end_day - 1)]
         # main data plot
         plt.figure().set_figwidth(15)
+        # plt.grid()
         plt.plot(self.samples, color='g', linewidth='0.8')
         self.showPlot()
         # macd and signal plot
         plt.figure().set_figwidth(15)
+        # plt.grid()
         plt.plot(self.macd, color='b', linewidth='0.8')
         plt.plot(self.signal, color='r', linewidth='0.8')
         self.showPlot()
@@ -69,7 +76,7 @@ class Macd:
         plt.plot(self.macd, color='b', linewidth='0.8')
         plt.plot(self.signal, color='r', linewidth='0.8')
         self.showPlot()
-        # all in one plot
+        # all in one plot with budget
         plt.figure().set_figwidth(15)
         plt.plot(self.samples, color='g', linewidth='0.8')
         plt.plot(self.macd, color='b', linewidth='0.8')
