@@ -17,20 +17,29 @@ class MatrixEquation:
         self.e = index_num % 1000 // 100
         self.f = index_num % 10_000 // 1000
         self.N = 9 * 100 + self.c * 10 + self.d
-        self.A = [[0 for x in range(self.N)] for y in range(self.N)]
-        self.b = [0 for x in range(self.N)]
+        self.A = [[0 for _ in range(self.N)] for _ in range(self.N)]
+        self.b = [0 for _ in range(self.N)]
         self.jacobi_time = []
         self.jacobi_iterations = []
         self.jacobi_residual = []
         self.gauss_seidel_time = []
         self.gauss_seidel_iterations = []
         self.gauss_seidel_residual = []
+        self.lu_factor_time = []
+        self.lu_factor_residual = []
 
     def createVectorB(self):
         for n in range(self.N):
             self.b[n] = math.sin(n * (self.f + 1))
 
+    def showMatrixParameters(self, a1, a2, a3):
+        print("|============= Matrix parameters =============|")
+        print(f"|-> a1={a1} a2={a2} a3={a3}")
+        print(f"|-> N={self.N}\n")
+        # print()
+
     def createBandMatrix(self, a1, a2, a3):
+        self.showMatrixParameters(a1, a2, a3)
         for i in range(self.N):
             for j in range(self.N):
                 if i == j:
@@ -45,7 +54,7 @@ class MatrixEquation:
         # can't multiply matrix with different size
         if len(matrix) != len(vector):
             return 0
-        new_vector = [0 for x in range(len(matrix))]
+        new_vector = [0 for _ in range(len(matrix))]
         for i in range(len(new_vector)):
             for j in range(len(new_vector)):
                 new_vector[i] += matrix[i][j] * vector[j]
@@ -70,8 +79,7 @@ class MatrixEquation:
         print(method)
         print(f"|-> Time: {str(op_time)} [s]")
         print(f"|-> Iteration: {iteration}")
-        print(f"|-> Residuum: {norm_res if (norm_res < 10e9) else norm_bigger_than}")
-        print("")
+        print(f"|-> Residuum: {norm_res if (norm_res < 10e9) else norm_bigger_than}\n")
 
     def jacobiMethod(self):
         # initial vector
@@ -137,3 +145,57 @@ class MatrixEquation:
         self.gauss_seidel_iterations.append(iteration)
         self.showResults(f"|************ Gauss-Seidel Method ************|",
                          norm_res, gs_time, iteration)
+
+    def createLU(self):
+        U = copy.deepcopy(self.A)
+        L = [[0 for _ in range(self.N)] for _ in range(self.N)]
+        # L = identity matrix
+        for i in range(self.N):
+            L[i][i] = 1
+        # creating L i U matrix
+        # algorithm from 2nd Lecture, page 25
+        for k in range(self.N - 1):
+            for j in range(k + 1, self.N):
+                L[j][k] = U[j][k] / U[k][k]
+                for m in range(k, self.N):
+                    U[j][m] -= L[j][k] * U[k][m]
+        return L, U
+
+    def factorizationLU(self):
+        # start timer
+        start = time.time()
+        L, U = self.createLU()
+
+        # forward-substitution (Ly = b)
+        y = [0 for _ in range(len(U))]
+        for i in range(len(y)):
+            tmp = 0
+            for k in range(i):
+                tmp += L[i][k] * y[k]
+            y[i] = (self.b[i] - tmp) / L[i][i]
+
+        # back-substitution (Ux = y)
+        x = [0 for x in range(len(U))]
+        for i in reversed(range(len(x))):
+            tmp = 0
+            for k in range(i + 1, len(x)):
+                tmp = tmp + U[i][k] * x[k]
+            x[i] = (y[i] - tmp) / U[i][i]
+        # end timer
+        end = time.time()
+
+        for i in y:
+            print(i, end=" ")
+        print()
+        for i in x:
+            print(i, end=" ")
+        print()
+        print()
+
+        norm_res = self.norm(self.calcResiduumVector(x))
+        lu_time = end - start
+        self.lu_factor_time.append(lu_time)
+        self.lu_factor_residual.append(norm_res)
+        self.showResults(f"|************* LU  Factorization *************|",
+                         norm_res, lu_time, 0)
+
