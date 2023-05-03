@@ -1,6 +1,8 @@
 import copy
 import math
 import time
+import decimal
+import matplotlib.pyplot as plt
 
 
 class MatrixEquation:
@@ -28,15 +30,21 @@ class MatrixEquation:
         self.lu_factor_time = []
         self.lu_factor_residual = []
 
+    def showMatrixParameters(self, a1, a2, a3):
+        print("|============== MATRIX PARAMETERS ==============|")
+        print(f"|      a1={a1}     a2={a2}     a3={a3}     N={self.N}   \t|\n")
+
+    @staticmethod
+    def showResults(method, norm_res, op_time, iteration):
+        norm_bigger_than = "Bigger than " + str(norm_res)
+        print(method)
+        print(f"|-> Time: {str(op_time)} [s]  \t\t\t\t|")
+        print(f"|-> Iteration: {iteration}\t\t\t\t\t\t\t\t|")
+        print(f"|-> Residuum: {norm_res if (norm_res < 10e9) else norm_bigger_than}  \t\t\t|\n")
+
     def createVectorB(self):
         for n in range(self.N):
             self.b[n] = math.sin(n * (self.f + 1))
-
-    def showMatrixParameters(self, a1, a2, a3):
-        print("|============= Matrix parameters =============|")
-        print(f"|-> a1={a1} a2={a2} a3={a3}")
-        print(f"|-> N={self.N}\n")
-        # print()
 
     def createBandMatrix(self, a1, a2, a3):
         self.showMatrixParameters(a1, a2, a3)
@@ -62,9 +70,10 @@ class MatrixEquation:
 
     @staticmethod
     def norm(res_vector):
-        norm_res = 0
+        decimal.getcontext().prec = 100
+        norm_res = decimal.Decimal(0)
         for i in range(len(res_vector)):
-            norm_res += res_vector[i] ** 2
+            norm_res += decimal.Decimal(res_vector[i]) ** decimal.Decimal(2)
         return math.sqrt(norm_res)
 
     def calcResiduumVector(self, x):
@@ -73,17 +82,9 @@ class MatrixEquation:
             res_vector[i] -= self.b[i]
         return res_vector
 
-    @staticmethod
-    def showResults(method, norm_res, op_time, iteration):
-        norm_bigger_than = "Bigger than " + str(norm_res)
-        print(method)
-        print(f"|-> Time: {str(op_time)} [s]")
-        print(f"|-> Iteration: {iteration}")
-        print(f"|-> Residuum: {norm_res if (norm_res < 10e9) else norm_bigger_than}\n")
-
     def jacobiMethod(self):
         # initial vector
-        x = [1 for _ in range(len(self.A))]
+        x = [1 for _ in range(self.N)]
         x_prev = copy.deepcopy(x)
         norm_res = self.norm(self.calcResiduumVector(x))
 
@@ -92,7 +93,7 @@ class MatrixEquation:
         # start timer
         start = time.time()
 
-        while norm_res > accuracy_threshold:
+        while 10e9 > norm_res > accuracy_threshold:
             self.jacobi_residual.append(norm_res)
             # equation from 3rd lecture, page 13 Jacobi:
             for i in range(len(x)):
@@ -109,10 +110,10 @@ class MatrixEquation:
         j_time = end - start
         self.jacobi_time.append(j_time)
         self.jacobi_iterations.append(iteration)
-        self.showResults(f"|*************** Jacobi Method ***************|",
+        self.showResults(f"|**************** Jacobi Method ****************|",
                          norm_res, j_time, iteration)
 
-    def gaussSeidelMethod(self):
+    def gaussSeidelMethod(self, to_plot):
         # initial vector
         x = [1 for _ in range(len(self.A))]
         x_prev = copy.deepcopy(x)
@@ -123,7 +124,7 @@ class MatrixEquation:
         # start timer
         start = time.time()
 
-        while norm_res > accuracy_threshold:
+        while 10e9 > norm_res > accuracy_threshold:
             self.gauss_seidel_residual.append(norm_res)
             # equation from 3rd lecture, page 13 Gauss-Seidl:
             for i in range(len(x)):
@@ -141,9 +142,10 @@ class MatrixEquation:
         # end timer
         end = time.time()
         gs_time = end - start
-        self.gauss_seidel_time.append(gs_time)
-        self.gauss_seidel_iterations.append(iteration)
-        self.showResults(f"|************ Gauss-Seidel Method ************|",
+        if to_plot:
+            self.gauss_seidel_time.append(gs_time)
+            self.gauss_seidel_iterations.append(iteration)
+        self.showResults(f"|************* Gauss-Seidel Method *************|",
                          norm_res, gs_time, iteration)
 
     def createLU(self):
@@ -167,35 +169,45 @@ class MatrixEquation:
         L, U = self.createLU()
 
         # forward-substitution (Ly = b)
-        y = [0 for _ in range(len(U))]
-        for i in range(len(y)):
+        y = [0 for _ in range(self.N)]
+        for i in range(self.N):
             tmp = 0
             for k in range(i):
                 tmp += L[i][k] * y[k]
             y[i] = (self.b[i] - tmp) / L[i][i]
 
         # back-substitution (Ux = y)
-        x = [0 for x in range(len(U))]
-        for i in reversed(range(len(x))):
+        x = [0 for x in range(self.N)]
+        for i in reversed(range(self.N)):
             tmp = 0
-            for k in range(i + 1, len(x)):
+            for k in range(i + 1, self.N):
                 tmp = tmp + U[i][k] * x[k]
             x[i] = (y[i] - tmp) / U[i][i]
         # end timer
         end = time.time()
 
-        for i in y:
-            print(i, end=" ")
-        print()
-        for i in x:
-            print(i, end=" ")
-        print()
-        print()
-
         norm_res = self.norm(self.calcResiduumVector(x))
         lu_time = end - start
         self.lu_factor_time.append(lu_time)
         self.lu_factor_residual.append(norm_res)
-        self.showResults(f"|************* LU  Factorization *************|",
+        self.showResults(f"|************** LU  Factorization **************|",
                          norm_res, lu_time, 0)
 
+    def resizeMatrix(self, new_size):
+        self.N = new_size
+        self.A = [[0 for x in range(self.N)] for y in range(self.N)]
+        self.b = [0 for x in range(self.N)]
+        self.createVectorB()
+
+    def showPlots(self, N):
+        # plt.figure().set_figwidth(15)
+        plt.yscale("log")
+        line_jacobi, = plt.plot(N, self.jacobi_time, color='g', linewidth='0.8', label='Jacobi')
+        line_gs, = plt.plot(N, self.gauss_seidel_time, color='b', linewidth='0.8', label='Gauss-Seidel')
+        line_lu, = plt.plot(N, self.lu_factor_time, color='r', linewidth='0.8', label='LU Factorization')
+        plt.legend(handles=[line_jacobi, line_gs, line_lu], loc='upper left')
+        plt.title("Duration of the algorithms")
+        plt.xlabel("Matrix Size - N")
+        plt.ylabel("Time [s]")
+        plt.axis([0, 3000, 10 ** (-1), 1E3])
+        plt.show()
