@@ -22,13 +22,8 @@ class MatrixEquation:
         self.A = [[0 for _ in range(self.N)] for _ in range(self.N)]
         self.b = [0 for _ in range(self.N)]
         self.jacobi_time = []
-        self.jacobi_iterations = []
-        self.jacobi_residual = []
         self.gauss_seidel_time = []
-        self.gauss_seidel_iterations = []
-        self.gauss_seidel_residual = []
         self.lu_factor_time = []
-        self.lu_factor_residual = []
 
     def showMatrixParameters(self, a1, a2, a3):
         print("|============== MATRIX PARAMETERS ==============|")
@@ -82,7 +77,7 @@ class MatrixEquation:
             res_vector[i] -= self.b[i]
         return res_vector
 
-    def jacobiMethod(self):
+    def jacobiMethod(self, to_plot):
         # initial vector
         x = [1 for _ in range(self.N)]
         x_prev = copy.deepcopy(x)
@@ -94,7 +89,6 @@ class MatrixEquation:
         start = time.time()
 
         while 10e9 > norm_res > accuracy_threshold:
-            self.jacobi_residual.append(norm_res)
             # equation from 3rd lecture, page 13 Jacobi:
             for i in range(len(x)):
                 tmp_sum = 0
@@ -108,8 +102,8 @@ class MatrixEquation:
         # end timer
         end = time.time()
         j_time = end - start
-        self.jacobi_time.append(j_time)
-        self.jacobi_iterations.append(iteration)
+        if to_plot:
+            self.jacobi_time.append(j_time)
         self.showResults(f"|**************** Jacobi Method ****************|",
                          norm_res, j_time, iteration)
 
@@ -125,7 +119,6 @@ class MatrixEquation:
         start = time.time()
 
         while 10e9 > norm_res > accuracy_threshold:
-            self.gauss_seidel_residual.append(norm_res)
             # equation from 3rd lecture, page 13 Gauss-Seidl:
             for i in range(len(x)):
                 tmp_sum_1 = 0
@@ -144,7 +137,6 @@ class MatrixEquation:
         gs_time = end - start
         if to_plot:
             self.gauss_seidel_time.append(gs_time)
-            self.gauss_seidel_iterations.append(iteration)
         self.showResults(f"|************* Gauss-Seidel Method *************|",
                          norm_res, gs_time, iteration)
 
@@ -163,7 +155,7 @@ class MatrixEquation:
                     U[j][m] -= L[j][k] * U[k][m]
         return L, U
 
-    def factorizationLU(self):
+    def factorizationLU(self, to_plot):
         # start timer
         start = time.time()
         L, U = self.createLU()
@@ -188,8 +180,8 @@ class MatrixEquation:
 
         norm_res = self.norm(self.calcResiduumVector(x))
         lu_time = end - start
-        self.lu_factor_time.append(lu_time)
-        self.lu_factor_residual.append(norm_res)
+        if to_plot:
+            self.lu_factor_time.append(lu_time)
         self.showResults(f"|************** LU  Factorization **************|",
                          norm_res, lu_time, 0)
 
