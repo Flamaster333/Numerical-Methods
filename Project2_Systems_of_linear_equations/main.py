@@ -11,11 +11,12 @@ if __name__ == '__main__':
     matrix.gaussSeidelMethod()
 
     # EX C
-    matrix.createBandMatrix(3, -1, -1)
-    matrix.jacobiMethod()
-    matrix.gaussSeidelMethod()
+    # there are too big numbers and program crashes while doing
+    # jacobi and gauss-seidel methods with a1 = 3, a2 = a3 = -1
+    # matrix.createBandMatrix(3, -1, -1)
+    # matrix.jacobiMethod()
+    # matrix.gaussSeidelMethod()
 
-    # for i in range(15):
-        # for j in range(15):
-            # print(matrix.A[i][j], end=' ')
-        # print("")
+    # EX D
+
+

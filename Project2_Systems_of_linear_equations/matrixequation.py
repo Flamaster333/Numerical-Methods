@@ -64,6 +64,15 @@ class MatrixEquation:
             res_vector[i] -= self.b[i]
         return res_vector
 
+    @staticmethod
+    def showResults(method, norm_res, op_time, iteration):
+        norm_bigger_than = "Bigger than " + str(norm_res)
+        print(method)
+        print(f"|-> Time: {str(op_time)} [s]")
+        print(f"|-> Iteration: {iteration}")
+        print(f"|-> Residuum: {norm_res if (norm_res < 10e9) else norm_bigger_than}")
+        print("")
+
     def jacobiMethod(self):
         # initial vector
         x = [1 for _ in range(len(self.A))]
@@ -89,15 +98,11 @@ class MatrixEquation:
             norm_res = self.norm(self.calcResiduumVector(x))
         # end timer
         end = time.time()
-        # printing sum up
-        norm_bigger_than = "Bigger than " + str(norm_res)
-        self.jacobi_time.append(end - start)
+        j_time = end - start
+        self.jacobi_time.append(j_time)
         self.jacobi_iterations.append(iteration)
-        print(f"|*************** Jacobi Method ***************|")
-        print(f"|-> Time: {str(end - start)} [s]")
-        print(f"|-> Iteration: {iteration}")
-        print(f"|-> Residuum: {norm_res if (norm_res < 10e9) else norm_bigger_than}")
-        print("")
+        self.showResults(f"|*************** Jacobi Method ***************|",
+                         norm_res, j_time, iteration)
 
     def gaussSeidelMethod(self):
         # initial vector
@@ -127,12 +132,8 @@ class MatrixEquation:
             norm_res = self.norm(self.calcResiduumVector(x))
         # end timer
         end = time.time()
-        # printing sum up
-        norm_bigger_than = "Bigger than " + str(norm_res)
-        self.gauss_seidel_time.append(end - start)
+        gs_time = end - start
+        self.gauss_seidel_time.append(gs_time)
         self.gauss_seidel_iterations.append(iteration)
-        print(f"|************ Gauss-Seidel Method ************|")
-        print(f"|-> Time: {str(end - start)} [s]")
-        print(f"|-> Iteration: {iteration}")
-        print(f"|-> Residuum: {norm_res if (norm_res < 10e9) else norm_bigger_than}")
-        print("")
+        self.showResults(f"|************ Gauss-Seidel Method ************|",
+                         norm_res, gs_time, iteration)
