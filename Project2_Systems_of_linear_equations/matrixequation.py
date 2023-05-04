@@ -22,8 +22,14 @@ class MatrixEquation:
         self.A = [[0 for _ in range(self.N)] for _ in range(self.N)]
         self.b = [0 for _ in range(self.N)]
         self.jacobi_time = []
+        self.jacobi_residuum = []
+        self.jacobi_iterations = []
         self.gauss_seidel_time = []
+        self.gauss_seidel_residuum = []
+        self.gauss_seidel_iterations = []
         self.lu_factor_time = []
+        self.lu_factor_residuum = []
+        self.lu_factor_iterations = []
 
     def showMatrixParameters(self, a1, a2, a3):
         print("|============== MATRIX PARAMETERS ==============|")
@@ -89,6 +95,7 @@ class MatrixEquation:
         start = time.time()
 
         while 10e9 > norm_res > accuracy_threshold:
+            self.jacobi_residuum.append(norm_res)
             # equation from 3rd lecture, page 13 Jacobi:
             for i in range(len(x)):
                 tmp_sum = 0
@@ -119,6 +126,7 @@ class MatrixEquation:
         start = time.time()
 
         while 10e9 > norm_res > accuracy_threshold:
+            self.gauss_seidel_residuum.append(norm_res)
             # equation from 3rd lecture, page 13 Gauss-Seidl:
             for i in range(len(x)):
                 tmp_sum_1 = 0
@@ -182,6 +190,7 @@ class MatrixEquation:
         lu_time = end - start
         if to_plot:
             self.lu_factor_time.append(lu_time)
+        self.lu_factor_residuum.append(norm_res)
         self.showResults(f"|************** LU  Factorization **************|",
                          norm_res, lu_time, 0)
 
@@ -191,8 +200,38 @@ class MatrixEquation:
         self.b = [0 for x in range(self.N)]
         self.createVectorB()
 
-    def showPlots(self, N):
-        # plt.figure().set_figwidth(15)
+    def showNormPlotIterB(self):
+        # residuum plot EX B
+        plt.yscale("log")
+        line_jacobi, = plt.plot(self.jacobi_residuum, color='g', linewidth='0.8', label='Jacobi')
+        line_gs, = plt.plot(self.gauss_seidel_residuum, color='b', linewidth='0.8', label='Gauss-Seidel')
+        plt.legend(handles=[line_jacobi, line_gs], loc='upper left')
+        plt.title("Norm of Residuum Vector Ex B")
+        plt.xlabel("Iteration")
+        plt.ylabel("Norm")
+        plt.axis([0, 25, 10 ** (-9), 1E3])
+        plt.show()
+        # clearing arrays
+        self.jacobi_residuum = []
+        self.gauss_seidel_residuum = []
+
+    def showNormPlotIterC(self):
+        # residuum plot EX C
+        plt.yscale("log")
+        line_jacobi, = plt.plot(self.jacobi_residuum, color='g', linewidth='0.8', label='Jacobi')
+        line_gs, = plt.plot(self.gauss_seidel_residuum, color='b', linewidth='0.8', label='Gauss-Seidel')
+        plt.legend(handles=[line_jacobi, line_gs], loc='upper left')
+        plt.title("Norm of Residuum Vector Ex C")
+        plt.xlabel("Iteration")
+        plt.ylabel("Norm")
+        plt.axis([0, 70, 0, 1E10])
+        plt.show()
+        # clearing arrays
+        self.jacobi_residuum = []
+        self.gauss_seidel_residuum = []
+
+    def showDurationPlot(self, N):
+        # duration plot
         plt.yscale("log")
         line_jacobi, = plt.plot(N, self.jacobi_time, color='g', linewidth='0.8', label='Jacobi')
         line_gs, = plt.plot(N, self.gauss_seidel_time, color='b', linewidth='0.8', label='Gauss-Seidel')
@@ -203,3 +242,4 @@ class MatrixEquation:
         plt.ylabel("Time [s]")
         plt.axis([0, 3000, 10 ** (-1), 1E3])
         plt.show()
+

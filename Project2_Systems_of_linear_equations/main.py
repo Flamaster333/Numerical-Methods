@@ -9,11 +9,13 @@ if __name__ == '__main__':
     # EX B
     matrix.jacobiMethod(False)
     matrix.gaussSeidelMethod(False)
+    matrix.showNormPlotIterB()
 
     # EX C
     matrix.createBandMatrix(3, -1, -1)
     matrix.jacobiMethod(False)
     matrix.gaussSeidelMethod(False)
+    matrix.showNormPlotIterC()
 
     # EX D
     matrix.factorizationLU(False)
@@ -27,4 +29,4 @@ if __name__ == '__main__':
         matrix.gaussSeidelMethod(True)
         matrix.factorizationLU(True)
 
-    matrix.showPlots(N)
+    matrix.showDurationPlot(N)
