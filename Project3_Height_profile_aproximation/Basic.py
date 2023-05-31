@@ -56,7 +56,7 @@ def draw_chart(interpolation_data, nodes, data, method, file):
     plt.ylabel('Height [m]')
     plt.legend()
 
-    plt.title(f'{method} - {str(len(nodes))} nodes')
+    plt.title(f'{method} - {str(len(nodes))} nodes\n{file}')
     chart = f'./Result/\\{method}\\interpolation_{file}_{method}_{str(len(nodes))}.png'
     plt.savefig(chart)
     plt.close()

@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from Basic import *
 from Lagrange import Lagrange
+from Spline import Spline
 
 if __name__ == '__main__':
     files_names = ["WielkiKanionKolorado", "MountEverest", "Obiadek", "SpacerniakGdansk", "Hel_yeah"]
@@ -12,6 +13,11 @@ if __name__ == '__main__':
         steps = [5, 10, 15, 50, 100, 200]
         # steps = [100, 200]
         for step in steps:
-            l = Lagrange(data)
-            result, nodes = l.lagrange_interpolation(step)
+            lagrange = Lagrange(data)
+            result, nodes = lagrange.lagrange_interpolation(step)
             draw_chart(result, nodes, data, 'Lagrange', file)
+
+        for step in steps:
+            spline = Spline(data)
+            result, nodes = spline.spline_interpolation(step)
+            draw_chart(result, nodes, data, 'Spline', file)
